@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/text000"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/dlbg">
+
+        <LinearLayout
+            android:id="@+id/rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/x20"
+            android:layout_marginRight="@dimen/x20"
+            android:layout_marginTop="@dimen/y150"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/x5"
+                android:text="设备号"
+                android:textColor="@color/bgfff"
+                android:textSize="@dimen/x15" />
+
+            <EditText
+                android:id="@+id/et_account"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/y33"
+                android:layout_centerVertical="true"
+                android:hint="请输入设备号后六位"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="@color/bgfff"
+                android:textColorHint="@color/bgfff" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rl2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl"
+            android:layout_marginLeft="@dimen/x20"
+            android:layout_marginRight="@dimen/x20"
+            android:layout_marginTop="@dimen/y15"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/x5"
+                android:text="安全码"
+                android:textColor="@color/bgfff"
+                android:textSize="@dimen/x15" />
+
+            <EditText
+                android:id="@+id/et_passwd"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/y33"
+                android:layout_centerVertical="true"
+                android:hint="请输入正确六位安全码"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:textColor="@color/bgfff"
+                android:textColorHint="@color/bgfff" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl3"
+            android:layout_width="@dimen/x264"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/x5">
+
+            <TextView
+                android:id="@+id/tv_lookuuid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="查看设备号"
+                android:textColor="@color/bgfff" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="@dimen/x262"
+            android:layout_height="@dimen/y33"
+            android:layout_marginTop="19dp"
+            android:background="@mipmap/btn_login"
+            android:text="登入程序"
+            android:textAllCaps="false"
+            android:textColor="@color/bgfff"
+            android:textSize="@dimen/x15"
+            android:visibility="visible"
+            android:layout_below="@+id/rl3"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x37"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="登录验证"
+                android:textColor="@color/bgfff"
+                android:textSize="@dimen/x16" />
+
+        </RelativeLayout>
+        <View
+            android:background="@color/text999"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x1"></View>
+    </LinearLayout>
+
+
+</FrameLayout>
