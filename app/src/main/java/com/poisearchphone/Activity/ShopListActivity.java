@@ -130,22 +130,7 @@ public class ShopListActivity extends BaseActivity {
         tvDaochutxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i = 0; i < adapter.getDatas().size(); i++) {
-                    if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
-                        if (adapter.getDatas().get(i).getTel().contains(";")) {
-                            String[] split = adapter.getDatas().get(i).getTel().split(";");
-                            for (int i1 = 0; i1 < split.length; i1++) {
-                                if (Validator.isMobile(split[i1])) {
-                                    addContact(adapter.getDatas().get(i).getName(), split[i1]);
-                                }
-                            }
-                        } else {
-                            if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
-                                addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
-                            }
-                        }
-                    }
-                }
+                flSave.setVisibility(View.GONE);
             }
         });
 
@@ -153,7 +138,52 @@ public class ShopListActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                flSave.setVisibility(View.GONE);
+                                dialog.show();
+                            }
+                        });
+                        for (int i = 0; i < adapter.getDatas().size(); i++) {
+                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
+                                if (adapter.getDatas().get(i).getTel().contains(";")) {
+                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
+                                    for (int i1 = 0; i1 < split.length; i1++) {
+                                        if (zuoji) {
+                                            if (Validator.isMobile(split[i1])) {
+                                                addContact(adapter.getDatas().get(i).getName(), split[i1]);
+                                            }
+                                        } else {
+                                            addContact(adapter.getDatas().get(i).getName(), split[i1]);
+                                        }
+                                    }
+                                } else {
+                                    if (zuoji) {
+                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
+                                            addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
+                                        }
+                                    } else {
+                                        addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
+                                    }
 
+                                }
+                            }
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                EasyToast.showShort(context, "导入完成");
+                            }
+                        });
+
+                    }
+                }).start();
             }
         });
 
@@ -162,14 +192,16 @@ public class ShopListActivity extends BaseActivity {
             public void onClick(View view) {
                 if (zuoji) {
                     tvShowall.setText("排除座机");
+                    tvYouxiao.setVisibility(View.GONE);
                 } else {
                     tvShowall.setText("展示全部");
+                    tvYouxiao.setVisibility(View.VISIBLE);
                 }
                 zuoji = !zuoji;
                 adapter.notifyDataSetChanged();
+                flSave.setVisibility(View.GONE);
             }
         });
-
 
     }
 
@@ -228,16 +260,6 @@ public class ShopListActivity extends BaseActivity {
 
                     final POIBean finalPoiBean = poiBean;
 
-                    if (p == 1) {
-                        adapter = new ShopListAdapter(ShopListActivity.this, poiBean);
-                        ceShiLv.setAdapter(adapter);
-                        ceShiLv.setCanloadMore(true);
-                    } else {
-                        adapter.setDatas((ArrayList) poiBean.getPois());
-                    }
-
-                    tvCount.setText("检索总数：" + adapter.getItemCount());
-
                     for (int i = 0; i < finalPoiBean.getPois().size(); i++) {
                         if (!"暂无".equals(finalPoiBean.getPois().get(i).getTel())) {
                             if (finalPoiBean.getPois().get(i).getTel().contains(";")) {
@@ -255,6 +277,17 @@ public class ShopListActivity extends BaseActivity {
                             }
                         }
                     }
+
+                    if (p == 1) {
+                        adapter = new ShopListAdapter(ShopListActivity.this, finalPoiBean);
+                        ceShiLv.setAdapter(adapter);
+                        ceShiLv.setCanloadMore(true);
+                    } else {
+                        adapter.setDatas((ArrayList) finalPoiBean.getPois());
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    tvCount.setText("检索总数：" + adapter.getItemCount());
 
                     tvYouxiao.setText("筛选结果数：" + youxiao);
 

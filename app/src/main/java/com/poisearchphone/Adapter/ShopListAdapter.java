@@ -64,47 +64,58 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
+        String[] split = datas.get(position).getTel().split(";");
+
         if (ShopListActivity.zuoji) {
-            if (datas.get(position).getTel().contains("暂无") || !Validator.isMobile(datas.get(position).getTel())) {
-                ViewGroup.LayoutParams layoutParams = holder.llGoods.getLayoutParams();
-                layoutParams.height = 0;
-                holder.llGoods.setLayoutParams(layoutParams);
-            } else {
-                holder.llGoods.measure(0, 0);
-                holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
-                holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
-                holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
-                holder.tvShoptel.setText("电话：" + datas.get(position).getTel());
-
-                holder.tvCall.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (!datas.get(position).getTel().contains("暂无")) {
-                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + datas.get(position).getTel()));
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mContext.startActivity(intent);
+            for (int i = 0; i < split.length; i++) {
+                if (datas.get(position).getTel().contains("暂无") || !Validator.isMobile(split[i])) {
+                    ViewGroup.LayoutParams layoutParams = holder.llGoods.getLayoutParams();
+                    layoutParams.height = 0;
+                    holder.llGoods.setLayoutParams(layoutParams);
+                } else {
+                    holder.llGoods.measure(0, 0);
+                    holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
+                    holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
+                    holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
+                    if (Validator.isMobile(split[i])) {
+                        holder.tvShoptel.setText("电话：" + split[i]);
+                    } else {
+                        holder.tvShoptel.setText("电话：" + split[0]);
+                    }
+                    holder.tvCall.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (!datas.get(position).getTel().contains("暂无")) {
+                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + datas.get(position).getTel()));
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                mContext.startActivity(intent);
+                            }
                         }
-                    }
-                });
+                    });
 
-                holder.tvAdd.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        addContact(datas.get(position).getName(), datas.get(position).getTel());
-                        EasyToast.showShort(mContext, "添加成功");
-                    }
-                });
+                    holder.tvAdd.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+
+                            addContact(datas.get(position).getName(), datas.get(position).getTel());
+                            EasyToast.showShort(mContext, "添加成功");
+                        }
+                    });
+                }
             }
-
         } else {
             holder.llGoods.measure(0, 0);
             holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
             holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
             holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
-
-
-            holder.tvShoptel.setText("电话：" + datas.get(position).getTel());
-
+            for (int i1 = 0; i1 < split.length; i1++) {
+                if (Validator.isMobile(split[i1])) {
+                    holder.tvShoptel.setText("电话：" + split[i1]);
+                } else {
+                    holder.tvShoptel.setText("电话：" + split[0]);
+                }
+            }
             holder.tvCall.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
