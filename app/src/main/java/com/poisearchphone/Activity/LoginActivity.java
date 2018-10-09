@@ -87,7 +87,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void initData() {
         Acp.getInstance(context).request(new AcpOptions.Builder()
-                        .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                , Manifest.permission.READ_CONTACTS
+                                , Manifest.permission.WRITE_CONTACTS
+                        )
                         .setDeniedMessage(getString(R.string.requstPerminssions))
                         .build(),
                 new AcpListener() {
@@ -113,7 +116,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void gotoMain() {
-        startActivity(new Intent(context, MainActivity.class));
+        startActivity(new Intent(context, HomeActivity.class));
         finish();
     }
 

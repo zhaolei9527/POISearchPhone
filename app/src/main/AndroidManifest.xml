@@ -19,6 +19,7 @@
         <activity android:name=".Activity.LoginActivity"></activity>
         <activity android:name=".Activity.UUIDActivity"></activity>
         <activity android:name=".Activity.ShopListActivity"></activity>
+        <activity android:name=".Activity.HomeActivity"></activity>
         <activity android:name=".Activity.FlashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

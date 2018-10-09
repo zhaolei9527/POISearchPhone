@@ -6,6 +6,33 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x37"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="HOTDOG NETWORK TECHNOLOGY"
+                android:textColor="@color/bgfff"
+                android:textSize="@dimen/x16"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x1"
+            android:background="@color/text999"></View>
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -83,13 +110,20 @@
             android:layout_marginTop="@dimen/x5">
 
             <CheckBox
-                android:id="@+id/cb_check"
+                android:id="@+id/cb_zuoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="自动导入通讯录"
+                android:text="过滤座机号码"
                 android:textColor="@color/bgfff" />
 
+            <CheckBox
+                android:id="@+id/cb_quchong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_toRightOf="@id/cb_zuoji"
+                android:text="去除重复"
+                android:textColor="@color/bgfff" />
         </RelativeLayout>
 
         <Button
@@ -107,33 +141,6 @@
             android:visibility="visible" />
 
     </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/x37"
-            android:visibility="visible">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="HOTDOG NETWORK TECHNOLOGY"
-                android:textColor="@color/bgfff"
-                android:textSize="@dimen/x16"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/x1"
-            android:background="@color/text999"></View>
-    </LinearLayout>
 
 
 </FrameLayout>

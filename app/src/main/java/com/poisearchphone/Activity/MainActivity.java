@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.android.volley.VolleyError;
@@ -32,8 +31,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     EditText etCity;
     @BindView(R.id.et_keyword)
     EditText etKeyword;
-    @BindView(R.id.cb_check)
-    CheckBox cbCheck;
     @BindView(R.id.btn_submit)
     Button btnSubmit;
     private String city;

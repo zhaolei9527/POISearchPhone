@@ -1,7 +1,15 @@
 package com.poisearchphone.Activity;
 
 import android.app.Dialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -28,7 +36,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 /**
  * com.lingqiapp.Activity
  *
@@ -71,16 +78,13 @@ public class ShopListActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
-
         rlBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-
         tvTitle.setText(city + "-" + keyword);
-
     }
 
     @Override
@@ -135,6 +139,27 @@ public class ShopListActivity extends BaseActivity {
                         ceShiLv.loadMoreComplete();
                         ceShiLv.setCanloadMore(true);
                     }
+
+                    final POIBean finalPoiBean = poiBean;
+
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            super.run();
+                            for (int i = 0; i < finalPoiBean.getPois().size(); i++) {
+                                if (!"暂无".equals(finalPoiBean.getPois().get(i).getTel())){
+                                    if (finalPoiBean.getPois().get(i).getTel().contains(";")){
+                                        String[] split = finalPoiBean.getPois().get(i).getTel().split(";");
+                                        addContact(finalPoiBean.getPois().get(i).getName(),split[0]);
+                                    }else {
+                                        addContact(finalPoiBean.getPois().get(i).getName(),finalPoiBean.getPois().get(i).getTel());
+                                    }
+                                }
+                            }
+
+                        }
+                    }.start();
+
                     if (p == 1) {
                         adapter = new ShopListAdapter(ShopListActivity.this, poiBean);
                         ceShiLv.setAdapter(adapter);
@@ -147,9 +172,7 @@ public class ShopListActivity extends BaseActivity {
                     } else {
                         adapter.setDatas((ArrayList) poiBean.getPois());
                     }
-
                     ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
-
                     p = p + 1;
                     initData();
                     poiBean = null;
@@ -166,5 +189,44 @@ public class ShopListActivity extends BaseActivity {
             }
         });
     }
+
+    // 一个添加联系人信息的例子
+    public void addContact(String name, String phoneNumber) {
+        // 创建一个空的ContentValues
+        ContentValues values = new ContentValues();
+        // 向RawContacts.CONTENT_URI空值插入，
+        // 先获取Android系统返回的rawContactId
+        // 后面要基于此id插入值
+        Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
+        long rawContactId = ContentUris.parseId(rawContactUri);
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        // 内容类型
+        values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
+        // 联系人名字
+        values.put(StructuredName.GIVEN_NAME, name);
+        // 向联系人URI添加联系人名字
+        getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        // 联系人的电话号码
+        values.put(Phone.NUMBER, phoneNumber);
+        // 电话类型
+        values.put(Phone.TYPE, Phone.TYPE_MOBILE);
+        // 向联系人电话号码URI添加电话号码
+        getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        // 联系人的Email地址
+        values.put(Email.DATA, "");
+        // 电子邮件的类型
+        values.put(Email.TYPE, Email.TYPE_WORK);
+        // 向联系人Email URI添加Email数据
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
 
 }

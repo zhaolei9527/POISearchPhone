@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bgfff">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/x10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="使用前必读"
+                android:textColor="@color/bgtitle"
+                android:textSize="@dimen/x18"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="使用前本系统提醒您： 在使用本系统的所有功能之前，请您务必仔细阅读并透彻理解本声明。您可以选择不使用本系统，但如果您使用本系统，您的使用行为将被视为对本声明全部内容的认可。
+免责声明： 鉴于本系统使用非人工检索/分析方式，无法确定您输入的条件进行是否合法，所以本系统对检索/分析出的结果不承担责任。如果因以本系统的检索/分析结果作为任何商业行为或者学术研究的依据而产生不良后果，本系统不承担任何法律责任。
+关于隐私权： 访问者在本系统注册时提供的一些个人资料，本系统除您本人同意外不会将用户的任何资料以任何方式泄露给第三方。当政府部门、司法机关等依照法定程序要求本系统披露个人资料时，本系统将根据执法单位之要求或为公共安全之目的提供个人资料，在此情况下的披露，本系统不承担任何责任。
+关于版权："
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="一、 凡本系统检索出所有结果，其版权属于数据来源《高德地图》所有。其他媒体、网站或个人转载使用时不得进行商业性的原版原式的转载，也不得歪曲和篡改本系统所发布的内容。"
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="二、 凡本系统转载其它媒体作品的目的在于传递更多信息，并不代表本系统赞同其观点和对其真实性负责；其他媒体、网站或个人转载使用时必须保留本站注明的文章来源，并自负法律责任。"
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="三、 被本系统授权使用的单位，不应超越授权范围。"
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="四、 本系统提供的资料如与相关资料提供不符时，以相关资料提供平台为准。"
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />v
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/x20"
+                android:text="五、 软件不生产/储存数据，软件只通过数据提供来源进行检索，软件仅供学习研究之用！严禁用途一切非法用途！作者保留一切解释权利！"
+                android:textColor="@color/text333"
+                android:textSize="@dimen/x12"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_gravity="center"
+                android:id="@+id/btn_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x10"
+                android:layout_marginTop="@dimen/x20"
+                android:background="@mipmap/btn_login"
+                android:text="我已阅读并同意"
+                android:textColor="@color/bgfff" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>
