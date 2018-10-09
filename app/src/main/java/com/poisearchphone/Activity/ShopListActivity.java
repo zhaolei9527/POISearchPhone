@@ -5,18 +5,20 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.RawContacts;
+import android.provider.ContactsContract;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
@@ -26,6 +28,7 @@ import com.poisearchphone.Bean.POIBean;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.Utils;
+import com.poisearchphone.Utils.Validator;
 import com.poisearchphone.View.ProgressView;
 import com.poisearchphone.View.SakuraLinearLayoutManager;
 import com.poisearchphone.View.WenguoyiRecycleView;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 /**
  * com.lingqiapp.Activity
  *
@@ -51,11 +55,27 @@ public class ShopListActivity extends BaseActivity {
     FrameLayout rlBack;
     @BindView(R.id.tv_title)
     TextView tvTitle;
+    @BindView(R.id.img_save)
+    ImageView imgSave;
+    @BindView(R.id.tv_count)
+    TextView tvCount;
+    @BindView(R.id.tv_youxiao)
+    TextView tvYouxiao;
+    @BindView(R.id.tv_daorucall)
+    TextView tvDaorucall;
+    @BindView(R.id.tv_showall)
+    TextView tvShowall;
+    @BindView(R.id.tv_daochutxt)
+    TextView tvDaochutxt;
+    @BindView(R.id.fl_save)
+    FrameLayout flSave;
     private int p = 1;
     private SakuraLinearLayoutManager line;
     private String city;
     private String keyword;
     private Dialog dialog;
+    public static boolean zuoji;
+    private int youxiao = 0;
 
     @Override
     protected int setthislayout() {
@@ -66,6 +86,14 @@ public class ShopListActivity extends BaseActivity {
     protected void initview() {
         city = getIntent().getStringExtra("city");
         keyword = getIntent().getStringExtra("keyword");
+        zuoji = getIntent().getBooleanExtra("zuoji", false);
+
+        if (!zuoji) {
+            tvYouxiao.setVisibility(View.GONE);
+            tvShowall.setText("排除座机");
+        } else {
+            tvShowall.setText("展示全部");
+        }
         line = new SakuraLinearLayoutManager(context);
         line.setOrientation(LinearLayoutManager.VERTICAL);
         ceShiLv.setLayoutManager(line);
@@ -84,7 +112,65 @@ public class ShopListActivity extends BaseActivity {
                 finish();
             }
         });
-        tvTitle.setText(city + "-" + keyword);
+
+        imgSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flSave.setVisibility(View.VISIBLE);
+            }
+        });
+
+        flSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flSave.setVisibility(View.GONE);
+            }
+        });
+
+        tvDaochutxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int i = 0; i < adapter.getDatas().size(); i++) {
+                    if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
+                        if (adapter.getDatas().get(i).getTel().contains(";")) {
+                            String[] split = adapter.getDatas().get(i).getTel().split(";");
+                            for (int i1 = 0; i1 < split.length; i1++) {
+                                if (Validator.isMobile(split[i1])) {
+                                    addContact(adapter.getDatas().get(i).getName(), split[i1]);
+                                }
+                            }
+                        } else {
+                            if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
+                                addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        tvDaorucall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+            }
+        });
+
+        tvShowall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (zuoji) {
+                    tvShowall.setText("排除座机");
+                } else {
+                    tvShowall.setText("展示全部");
+                }
+                zuoji = !zuoji;
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+
     }
 
     @Override
@@ -142,36 +228,36 @@ public class ShopListActivity extends BaseActivity {
 
                     final POIBean finalPoiBean = poiBean;
 
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            super.run();
-                            for (int i = 0; i < finalPoiBean.getPois().size(); i++) {
-                                if (!"暂无".equals(finalPoiBean.getPois().get(i).getTel())){
-                                    if (finalPoiBean.getPois().get(i).getTel().contains(";")){
-                                        String[] split = finalPoiBean.getPois().get(i).getTel().split(";");
-                                        addContact(finalPoiBean.getPois().get(i).getName(),split[0]);
-                                    }else {
-                                        addContact(finalPoiBean.getPois().get(i).getName(),finalPoiBean.getPois().get(i).getTel());
-                                    }
-                                }
-                            }
-
-                        }
-                    }.start();
-
                     if (p == 1) {
                         adapter = new ShopListAdapter(ShopListActivity.this, poiBean);
                         ceShiLv.setAdapter(adapter);
-                        if (poiBean.getPois().size() < 10) {
-                            ceShiLv.setCanloadMore(false);
-                            ceShiLv.loadMoreEnd();
-                        } else {
-                            ceShiLv.setCanloadMore(true);
-                        }
+                        ceShiLv.setCanloadMore(true);
                     } else {
                         adapter.setDatas((ArrayList) poiBean.getPois());
                     }
+
+                    tvCount.setText("检索总数：" + adapter.getItemCount());
+
+                    for (int i = 0; i < finalPoiBean.getPois().size(); i++) {
+                        if (!"暂无".equals(finalPoiBean.getPois().get(i).getTel())) {
+                            if (finalPoiBean.getPois().get(i).getTel().contains(";")) {
+                                String[] split = finalPoiBean.getPois().get(i).getTel().split(";");
+                                for (int i1 = 0; i1 < split.length; i1++) {
+                                    if (Validator.isMobile(split[i1])) {
+                                        youxiao = youxiao + 1;
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                if (Validator.isMobile(finalPoiBean.getPois().get(i).getTel())) {
+                                    youxiao = youxiao + 1;
+                                }
+                            }
+                        }
+                    }
+
+                    tvYouxiao.setText("筛选结果数：" + youxiao);
+
                     ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
                     p = p + 1;
                     initData();
@@ -200,17 +286,17 @@ public class ShopListActivity extends BaseActivity {
         Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
         long rawContactId = ContentUris.parseId(rawContactUri);
         values.clear();
-        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
         // 内容类型
-        values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
+        values.put(ContactsContract.Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
         // 联系人名字
         values.put(StructuredName.GIVEN_NAME, name);
         // 向联系人URI添加联系人名字
         getContentResolver().insert(Data.CONTENT_URI, values);
         values.clear();
 
-        values.put(Data.RAW_CONTACT_ID, rawContactId);
-        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+        values.put(ContactsContract.Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
         // 联系人的电话号码
         values.put(Phone.NUMBER, phoneNumber);
         // 电话类型
@@ -218,8 +304,8 @@ public class ShopListActivity extends BaseActivity {
         // 向联系人电话号码URI添加电话号码
         getContentResolver().insert(Data.CONTENT_URI, values);
         values.clear();
-        values.put(Data.RAW_CONTACT_ID, rawContactId);
-        values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+        values.put(ContactsContract.Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
         // 联系人的Email地址
         values.put(Email.DATA, "");
         // 电子邮件的类型
@@ -227,6 +313,5 @@ public class ShopListActivity extends BaseActivity {
         // 向联系人Email URI添加Email数据
         getContentResolver().insert(Data.CONTENT_URI, values);
     }
-
 
 }

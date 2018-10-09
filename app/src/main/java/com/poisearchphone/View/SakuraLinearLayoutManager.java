@@ -1,13 +1,10 @@
 package com.poisearchphone.View;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
@@ -281,23 +278,6 @@ public class SakuraLinearLayoutManager extends LinearLayoutManager {
         Log.w("LinearLayoutManager", "Can't make LayoutParams insets dirty, decorations measurements might be incorrect");
     }
 
-    @Override
-    public void smoothScrollToPosition(RecyclerView recyclerView,
-                                       RecyclerView.State state, final int position) {
-        LinearSmoothScroller smoothScroller = new LinearSmoothScroller(recyclerView.getContext()) {
-            @Override
-            protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                return 1500f / displayMetrics.densityDpi;
-            }
-
-            @Override
-            public PointF computeScrollVectorForPosition(int targetPosition) {
-                return null;
-            }
-        };
-        smoothScroller.setTargetPosition(position);
-        startSmoothScroll(smoothScroller);
-    }
 
 
 }

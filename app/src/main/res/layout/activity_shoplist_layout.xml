@@ -41,8 +41,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:text="检索结果"
                     android:textColor="@color/text333"
                     android:textSize="@dimen/x16" />
+
+                <ImageView
+                    android:id="@+id/img_save"
+                    android:layout_width="@dimen/x20"
+                    android:layout_height="@dimen/x20"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="@dimen/x10"
+                    android:background="@mipmap/save" />
 
             </RelativeLayout>
 
@@ -53,6 +63,34 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/x5"
+            android:text="检索总数："
+            android:textColor="@color/text333"
+            android:textSize="@dimen/x12" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/y1"
+            android:background="@color/bgddd"></View>
+
+        <TextView
+            android:id="@+id/tv_youxiao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/x5"
+            android:text="筛选结果数："
+            android:textColor="@color/text333"
+            android:textSize="@dimen/x12" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/y1"
+            android:background="@color/bgddd"></View>
+
         <com.poisearchphone.View.WenguoyiRecycleView
             android:id="@+id/ce_shi_lv"
             android:layout_width="match_parent"
@@ -60,8 +98,68 @@
             android:clipChildren="false"
             android:clipToPadding="false"></com.poisearchphone.View.WenguoyiRecycleView>
 
-
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/fl_save"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#9da9a9a9"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="@dimen/x100"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/x37"
+            android:background="@color/bgfff"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_daorucall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/x5"
+                android:text="全部导入"
+                android:textSize="@dimen/x13" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x1"
+                android:background="@color/bgddd"
+                android:padding="@dimen/x5"></View>
+
+            <TextView
+                android:id="@+id/tv_showall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/x5"
+                android:text="展示全部"
+                android:textSize="@dimen/x13" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x1"
+                android:background="@color/bgddd"
+                android:padding="@dimen/x5"></View>
+
+            <TextView
+                android:id="@+id/tv_daochutxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/x5"
+                android:text="导出文件"
+                android:textSize="@dimen/x13" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x1"
+                android:background="@color/bgddd"
+                android:padding="@dimen/x5"></View>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </FrameLayout>

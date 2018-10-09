@@ -1,19 +1,27 @@
 package com.poisearchphone.Adapter;
 
 import android.app.Activity;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.poisearchphone.Activity.ShopListActivity;
 import com.poisearchphone.Bean.POIBean;
 import com.poisearchphone.R;
+import com.poisearchphone.Utils.EasyToast;
+import com.poisearchphone.Utils.Validator;
 
 import java.util.ArrayList;
 
@@ -53,34 +61,69 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         return vp;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
-        holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
-        holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
-        holder.tvShoptel.setText("电话：" + datas.get(position).getTel());
 
-        holder.tvCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if (ShopListActivity.zuoji) {
+            if (datas.get(position).getTel().contains("暂无") || !Validator.isMobile(datas.get(position).getTel())) {
+                ViewGroup.LayoutParams layoutParams = holder.llGoods.getLayoutParams();
+                layoutParams.height = 0;
+                holder.llGoods.setLayoutParams(layoutParams);
+            } else {
+                holder.llGoods.measure(0, 0);
+                holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
+                holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
+                holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
+                holder.tvShoptel.setText("电话：" + datas.get(position).getTel());
 
-                if (!datas.get(position).getTel().contains("暂无")){
-                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + datas.get(position).getTel()));
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                holder.tvCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!datas.get(position).getTel().contains("暂无")) {
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + datas.get(position).getTel()));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(intent);
+                        }
+                    }
+                });
+
+                holder.tvAdd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        addContact(datas.get(position).getName(), datas.get(position).getTel());
+                        EasyToast.showShort(mContext, "添加成功");
+                    }
+                });
+            }
+
+        } else {
+            holder.llGoods.measure(0, 0);
+            holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
+            holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
+            holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
+
+
+            holder.tvShoptel.setText("电话：" + datas.get(position).getTel());
+
+            holder.tvCall.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!datas.get(position).getTel().contains("暂无")) {
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + datas.get(position).getTel()));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
                 }
+            });
 
-            }
-        });
-
-
-        holder.tvAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+            holder.tvAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    addContact(datas.get(position).getName(), datas.get(position).getTel());
+                    EasyToast.showShort(mContext, "添加成功");
+                }
+            });
+        }
 
     }
 
@@ -103,12 +146,50 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         @BindView(R.id.tv_call)
         TextView tvCall;
         @BindView(R.id.ll_goods)
-        LinearLayout llGoods;
+        FrameLayout llGoods;
 
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
+    }
+
+    // 一个添加联系人信息的例子
+    public void addContact(String name, String phoneNumber) {
+        // 创建一个空的ContentValues
+        ContentValues values = new ContentValues();
+        // 向RawContacts.CONTENT_URI空值插入，
+        // 先获取Android系统返回的rawContactId
+        // 后面要基于此id插入值
+        Uri rawContactUri = mContext.getContentResolver().insert(RawContacts.CONTENT_URI, values);
+        long rawContactId = ContentUris.parseId(rawContactUri);
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        // 内容类型
+        values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
+        // 联系人名字
+        values.put(StructuredName.GIVEN_NAME, name);
+        // 向联系人URI添加联系人名字
+        mContext.getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        // 联系人的电话号码
+        values.put(Phone.NUMBER, phoneNumber);
+        // 电话类型
+        values.put(Phone.TYPE, Phone.TYPE_MOBILE);
+        // 向联系人电话号码URI添加电话号码
+        mContext.getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        // 联系人的Email地址
+        values.put(Email.DATA, "");
+        // 电子邮件的类型
+        values.put(Email.TYPE, Email.TYPE_WORK);
+        // 向联系人Email URI添加Email数据
+        mContext.getContentResolver().insert(Data.CONTENT_URI, values);
     }
 
 }

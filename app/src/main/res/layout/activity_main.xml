@@ -113,17 +113,10 @@
                 android:id="@+id/cb_zuoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:text="过滤座机号码"
                 android:textColor="@color/bgfff" />
 
-            <CheckBox
-                android:id="@+id/cb_quchong"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/x5"
-                android:layout_toRightOf="@id/cb_zuoji"
-                android:text="去除重复"
-                android:textColor="@color/bgfff" />
         </RelativeLayout>
 
         <Button

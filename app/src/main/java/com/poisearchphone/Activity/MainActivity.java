@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.android.volley.VolleyError;
@@ -33,6 +34,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     EditText etKeyword;
     @BindView(R.id.btn_submit)
     Button btnSubmit;
+    @BindView(R.id.cb_zuoji)
+    CheckBox cbZuoji;
     private String city;
     private String keyword;
     private Dialog dialog;
@@ -146,6 +149,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                         startActivity(new Intent(context, ShopListActivity.class)
                                                 .putExtra("keyword", keyword)
                                                 .putExtra("city", city)
+                                                .putExtra("zuoji", cbZuoji.isChecked())
                                         );
                                     } else {
                                         dialog.dismiss();
