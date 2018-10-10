@@ -16,15 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import com.poisearchphone.Activity.ShopListActivity;
 import com.poisearchphone.Bean.POIBean;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.Validator;
-
 import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -63,9 +60,7 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-
         String[] split = datas.get(position).getTel().split(";");
-
         if (ShopListActivity.zuoji) {
             for (int i = 0; i < split.length; i++) {
                 if (datas.get(position).getTel().contains("暂无") || !Validator.isMobile(split[i])) {
@@ -75,6 +70,7 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
                 } else {
                     holder.llGoods.measure(0, 0);
                     holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
+                    holder.tvNum.setText(String.valueOf(position));
                     holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
                     holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
                     if (Validator.isMobile(split[i])) {
@@ -92,12 +88,9 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
                             }
                         }
                     });
-
                     holder.tvAdd.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-
-
                             addContact(datas.get(position).getName(), datas.get(position).getTel());
                             EasyToast.showShort(mContext, "添加成功");
                         }
@@ -106,6 +99,7 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
             }
         } else {
             holder.llGoods.measure(0, 0);
+            holder.tvNum.setText(String.valueOf(position));
             holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
             holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
             holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
@@ -156,6 +150,8 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         TextView tvAdd;
         @BindView(R.id.tv_call)
         TextView tvCall;
+        @BindView(R.id.tv_num)
+        TextView tvNum;
         @BindView(R.id.ll_goods)
         FrameLayout llGoods;
 

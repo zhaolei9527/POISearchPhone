@@ -160,6 +160,7 @@ public class ShopListActivity extends BaseActivity {
                                         } else {
                                             addContact(adapter.getDatas().get(i).getName(), split[i1]);
                                         }
+                                        continue;
                                     }
                                 } else {
                                     if (zuoji) {
@@ -267,7 +268,7 @@ public class ShopListActivity extends BaseActivity {
                                 for (int i1 = 0; i1 < split.length; i1++) {
                                     if (Validator.isMobile(split[i1])) {
                                         youxiao = youxiao + 1;
-                                        continue;
+                                        break;
                                     }
                                 }
                             } else {
@@ -323,7 +324,7 @@ public class ShopListActivity extends BaseActivity {
         // 内容类型
         values.put(ContactsContract.Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
         // 联系人名字
-        values.put(StructuredName.GIVEN_NAME, name);
+        values.put(StructuredName.GIVEN_NAME, "SAK"+name);
         // 向联系人URI添加联系人名字
         getContentResolver().insert(Data.CONTENT_URI, values);
         values.clear();
