@@ -3,6 +3,7 @@ package com.poisearchphone.Activity;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -13,6 +14,7 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -27,6 +29,7 @@ import com.poisearchphone.Base.BaseActivity;
 import com.poisearchphone.Bean.POIBean;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
+import com.poisearchphone.Utils.SpUtil;
 import com.poisearchphone.Utils.Utils;
 import com.poisearchphone.Utils.Validator;
 import com.poisearchphone.View.ProgressView;
@@ -35,6 +38,8 @@ import com.poisearchphone.View.WenguoyiRecycleView;
 import com.poisearchphone.Volley.VolleyInterface;
 import com.poisearchphone.Volley.VolleyRequest;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -85,6 +90,18 @@ public class ShopListActivity extends BaseActivity {
 
     @Override
     protected void initview() {
+
+        String psw = (String) SpUtil.get(context, "psw", "");
+        String account = (String) SpUtil.get(context, "account", "");
+
+        if (TextUtils.isEmpty(psw)) {
+            startActivity(new Intent(context, LoginActivity.class));
+        }
+
+        if (TextUtils.isEmpty(account)) {
+            startActivity(new Intent(context, LoginActivity.class));
+        }
+
         city = getIntent().getStringExtra("city");
         keyword = getIntent().getStringExtra("keyword");
         zuoji = getIntent().getBooleanExtra("zuoji", false);
@@ -139,6 +156,54 @@ public class ShopListActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 flSave.setVisibility(View.GONE);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                flSave.setVisibility(View.GONE);
+                                dialog.show();
+                            }
+                        });
+                        for (int i = 0; i < adapter.getDatas().size(); i++) {
+                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
+                                if (adapter.getDatas().get(i).getTel().contains(";")) {
+                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
+                                    for (int i1 = 0; i1 < split.length; i1++) {
+                                        if (zuoji) {
+                                            if (Validator.isMobile(split[i1])) {
+                                                writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                            }
+                                        } else {
+                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                        }
+                                        continue;
+                                    }
+                                } else {
+                                    if (zuoji) {
+                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
+                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                        }
+                                    } else {
+                                        writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                    }
+                                }
+                            }
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                EasyToast.showShort(context, "导出完成：目录 /sdcard/POISearch/Search.txt");
+                            }
+                        });
+
+                    }
+                }).start();
+
+
             }
         });
 
@@ -330,7 +395,7 @@ public class ShopListActivity extends BaseActivity {
         // 内容类型
         values.put(ContactsContract.Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
         // 联系人名字
-        values.put(StructuredName.GIVEN_NAME, "SAK"+name);
+        values.put(StructuredName.GIVEN_NAME, "SAK" + name);
         // 向联系人URI添加联系人名字
         getContentResolver().insert(Data.CONTENT_URI, values);
         values.clear();
@@ -354,4 +419,60 @@ public class ShopListActivity extends BaseActivity {
         getContentResolver().insert(Data.CONTENT_URI, values);
     }
 
+    private void writeData(String txt) {
+        String filePath = "/sdcard/POISearch/";
+        String fileName = "Search.txt";
+        writeTxtToFile(txt, filePath, fileName);
+    }
+
+    // 将字符串写入到文本文件中
+    public void writeTxtToFile(String strcontent, String filePath, String fileName) {
+        //生成文件夹之后，再生成文件，不然会出错
+        makeFilePath(filePath, fileName);
+        String strFilePath = filePath + fileName;
+        // 每次写入时，都换行写
+        String strContent = strcontent + "\r\n";
+        try {
+            File file = new File(strFilePath);
+            if (!file.exists()) {
+                Log.d("TestFile", "Create the file:" + strFilePath);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            RandomAccessFile raf = new RandomAccessFile(file, "rwd");
+            raf.seek(file.length());
+            raf.write(strContent.getBytes());
+            raf.close();
+        } catch (Exception e) {
+            Log.e("TestFile", "Error on write File:" + e);
+        }
+    }
+
+    // 生成文件
+    public File makeFilePath(String filePath, String fileName) {
+        File file = null;
+        makeRootDirectory(filePath);
+        try {
+            file = new File(filePath + fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
+
+    // 生成文件夹
+    public static void makeRootDirectory(String filePath) {
+        File file = null;
+        try {
+            file = new File(filePath);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+        } catch (Exception e) {
+            Log.i("error:", e + "");
+        }
+    }
 }

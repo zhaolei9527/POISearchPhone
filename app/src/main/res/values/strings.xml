@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">POISearchPhone</string>
+    <string name="app_name">智能商户助手</string>
     <string name="loading">加载中......</string>
     <string name="requstPerminssions">权限申请</string>
     <string name="notmore">没有更多了</string>
