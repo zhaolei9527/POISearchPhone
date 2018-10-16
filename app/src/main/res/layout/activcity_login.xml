@@ -12,12 +12,13 @@
         android:background="@mipmap/dlbg">
 
         <LinearLayout
+            android:visibility="invisible"
             android:id="@+id/rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/x20"
             android:layout_marginRight="@dimen/x20"
-            android:layout_marginTop="@dimen/y150"
+            android:layout_marginTop="@dimen/y100"
             android:orientation="vertical">
 
             <TextView
@@ -57,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/x5"
-                android:text="安全码"
+                android:text="注册码"
                 android:textColor="@color/bgfff"
                 android:textSize="@dimen/x15" />
 
@@ -66,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/y33"
                 android:layout_centerVertical="true"
-                android:hint="请输入正确六位安全码"
+                android:hint="请输入正确六位注册码"
                 android:inputType="textPassword"
                 android:singleLine="true"
                 android:textColor="@color/bgfff"
@@ -75,6 +76,7 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:visibility="invisible"
             android:id="@+id/rl3"
             android:layout_width="@dimen/x264"
             android:layout_height="wrap_content"

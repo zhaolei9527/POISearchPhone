@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,6 +24,11 @@ import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.SpUtil;
 import com.poisearchphone.Utils.Utils;
+
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.view.annotation.Event;
+import org.xutils.x;
 
 import java.util.List;
 
@@ -125,42 +131,67 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                String account = etAccount.getText().toString().trim();
-                String psw = etPasswd.getText().toString().trim();
-                if (TextUtils.isEmpty(account)) {
-                    Toast.makeText(context, etAccount.getHint().toString(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (account.length() != 6) {
-                    Toast.makeText(context, etAccount.getHint().toString(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                str = Secure.getString(getContentResolver(), Secure.ANDROID_ID).substring(Secure.getString(getContentResolver(), Secure.ANDROID_ID).length() - 6, Secure.getString(getContentResolver(), Secure.ANDROID_ID).length());
-
-                if (!account.equals(str)) {
-                    Toast.makeText(context, etAccount.getHint().toString(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
+                //String account = etAccount.getText().toString().trim();
+                final String psw = etPasswd.getText().toString().trim();
                 if (TextUtils.isEmpty(psw)) {
                     Toast.makeText(context, etPasswd.getHint().toString(), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                str = Utils.md5(str);
-                str = Utils.md5(str);
-                str = str.substring(str.length() - 6, str.length()); // or str=str.Remove(str.Length-i,i);
-                if (str.equals(psw)) {
-                    gotoMain();
-                    EasyToast.showShort(context, "登入成功");
-                    SpUtil.putAndApply(context, "account", account);
-                    SpUtil.putAndApply(context, "psw", psw);
-                } else {
+                if (psw.length() != 6) {
                     Toast.makeText(context, etPasswd.getHint().toString(), Toast.LENGTH_SHORT).show();
                     return;
                 }
+//                if (!account.equals(str)) {
+//                    Toast.makeText(context, etAccount.getHint().toString(), Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+
+                RequestParams params = new RequestParams("http://43.251.116.250:8080/sakura.txt");
+                x.http().get(params, new Callback.CommonCallback<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if (result.contains(psw)) {
+                            String[] split = result.split("#");
+                            for (int i = 0; i < split.length; i++) {
+                                String s = split[i].toString();
+                                Log.e("aaaa", "onSuccess: "+s );
+                                if (split[i].contains(psw)){
+                                    Log.e("aaaa", "true: "+s );
+                                    if (split[i].startsWith("X")){
+                                        Log.e("aaaa", "true:X "+s );
+                                        EasyToast.showShort(context, "注册码已失效");
+                                        return;
+                                    }
+                                }
+                            }
+                            gotoMain();
+                            EasyToast.showShort(context, "登入成功");
+                            //SpUtil.putAndApply(context, "account", account);
+                            SpUtil.putAndApply(context, "psw", psw);
+                        } else {
+                            Toast.makeText(context, etPasswd.getHint().toString(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable ex, boolean isOnCallback) {
+                        Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCancelled(CancelledException cex) {
+                        Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFinished() {
+
+                    }
+                });
+
+
 
                 break;
             default:

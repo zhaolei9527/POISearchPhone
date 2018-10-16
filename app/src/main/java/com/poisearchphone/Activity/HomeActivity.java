@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,6 +22,7 @@ import com.poisearchphone.Base.BaseActivity;
 import com.poisearchphone.CommomDialog;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
+import com.poisearchphone.Utils.SpUtil;
 import com.poisearchphone.Utils.Utils;
 
 import java.util.ArrayList;
@@ -162,7 +164,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(context, LoginActivity.class));
                 break;
             case R.id.ll_jiansuo:
-                startActivity(new Intent(context, LoginActivity.class));
+                String psw = (String) SpUtil.get(context, "psw", "");
+                if (TextUtils.isEmpty(psw)) {
+                    startActivity(new Intent(context, LoginActivity.class));
+                } else {
+                    startActivity(new Intent(context, MainActivity.class));
+                }
                 break;
             case R.id.ll_mianze:
                 startActivity(new Intent(context, XieYiActivity.class).putExtra("type", "1"));

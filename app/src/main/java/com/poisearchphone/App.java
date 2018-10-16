@@ -10,6 +10,8 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.poisearchphone.Utils.PausableThreadPoolExecutor;
 import com.tencent.bugly.Bugly;
 
+import org.xutils.x;
+
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +36,8 @@ public class App extends MultiDexApplication {
         queues = Volley.newRequestQueue(getApplicationContext());
         Fresco.initialize(this);
         pausableThreadPoolExecutor = new PausableThreadPoolExecutor(1, 1, 0L, TimeUnit.SECONDS, new PriorityBlockingQueue<Runnable>());
+        x.Ext.init(this);
+        x.Ext.setDebug(BuildConfig.DEBUG); // 是否输出debug日志, 开启debug会影响性能.
     }
 
     public static RequestQueue getQueues() {

@@ -92,15 +92,15 @@ public class ShopListActivity extends BaseActivity {
     protected void initview() {
 
         String psw = (String) SpUtil.get(context, "psw", "");
-        String account = (String) SpUtil.get(context, "account", "");
+        //String account = (String) SpUtil.get(context, "account", "");
 
         if (TextUtils.isEmpty(psw)) {
             startActivity(new Intent(context, LoginActivity.class));
         }
 
-        if (TextUtils.isEmpty(account)) {
-            startActivity(new Intent(context, LoginActivity.class));
-        }
+//        if (TextUtils.isEmpty(account)) {
+//            startActivity(new Intent(context, LoginActivity.class));
+//        }
 
         city = getIntent().getStringExtra("city");
         keyword = getIntent().getStringExtra("keyword");
