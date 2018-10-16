@@ -11,17 +11,23 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import com.poisearchphone.Activity.ShopListActivity;
 import com.poisearchphone.Bean.POIBean;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.Validator;
+
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -179,7 +185,6 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         // 向联系人URI添加联系人名字
         mContext.getContentResolver().insert(Data.CONTENT_URI, values);
         values.clear();
-
         values.put(Data.RAW_CONTACT_ID, rawContactId);
         values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
         // 联系人的电话号码
@@ -198,5 +203,65 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         // 向联系人Email URI添加Email数据
         mContext.getContentResolver().insert(Data.CONTENT_URI, values);
     }
+
+
+    private void writeData() {
+        String filePath = "/sdcard/Test/";
+        String fileName = "log.txt";
+
+        writeTxtToFile("txt content", filePath, fileName);
+    }
+
+    // 将字符串写入到文本文件中
+    public void writeTxtToFile(String strcontent, String filePath, String fileName) {
+        //生成文件夹之后，再生成文件，不然会出错
+        makeFilePath(filePath, fileName);
+        String strFilePath = filePath + fileName;
+        // 每次写入时，都换行写
+        String strContent = strcontent + "\r\n";
+        try {
+            File file = new File(strFilePath);
+            if (!file.exists()) {
+                Log.d("TestFile", "Create the file:" + strFilePath);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            RandomAccessFile raf = new RandomAccessFile(file, "rwd");
+            raf.seek(file.length());
+            raf.write(strContent.getBytes());
+            raf.close();
+        } catch (Exception e) {
+            Log.e("TestFile", "Error on write File:" + e);
+        }
+    }
+
+    // 生成文件
+    public File makeFilePath(String filePath, String fileName) {
+        File file = null;
+        makeRootDirectory(filePath);
+        try {
+            file = new File(filePath + fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
+
+    // 生成文件夹
+    public static void makeRootDirectory(String filePath) {
+        File file = null;
+        try {
+            file = new File(filePath);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+        } catch (Exception e) {
+            Log.i("error:", e + "");
+        }
+    }
+
 
 }

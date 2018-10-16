@@ -1,7 +1,9 @@
 package com.poisearchphone.Activity;
 
+import android.content.ClipboardManager;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,12 +13,15 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.poisearchphone.Base.BaseActivity;
 import com.poisearchphone.R;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -27,6 +32,19 @@ import butterknife.ButterKnife;
  * 功能描述：
  */
 public class HomeActivity extends BaseActivity {
+
+    @BindView(R.id.ll_jiansuo)
+    LinearLayout llJiansuo;
+    @BindView(R.id.ll_qingchu)
+    LinearLayout llQingchu;
+    @BindView(R.id.ll_dianchi)
+    LinearLayout llDianchi;
+    @BindView(R.id.ll_yanzheng)
+    LinearLayout llYanzheng;
+    @BindView(R.id.textView)
+    TextView textView;
+    @BindView(R.id.ll_mianze)
+    LinearLayout llMianze;
 
     @Override
     protected void ready() {
@@ -45,7 +63,8 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initview() {
-
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        cm.setText("支付宝红包再升级，红包种类更多，金额更大！人人可领，天天可领！长按复制此消息，打开支付宝领红包！8FsVse63vy");
     }
 
     @Override

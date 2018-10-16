@@ -78,7 +78,7 @@ public class FlashActivity extends BaseActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(context, LoginActivity.class));
+                startActivity(new Intent(context, HomeActivity.class));
                 finish();
             }
         }, 2000);
