@@ -90,6 +90,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE
                                 , Manifest.permission.READ_CONTACTS
                                 , Manifest.permission.WRITE_CONTACTS
+                                , Manifest.permission.RECORD_AUDIO
                         )
                         .setDeniedMessage(getString(R.string.requstPerminssions))
                         .build(),

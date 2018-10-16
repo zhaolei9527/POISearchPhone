@@ -6,6 +6,11 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -14,11 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.RawContacts;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
@@ -39,6 +39,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.fangx.haorefresh.LoadMoreListener;
 
 /**
  * com.lingqiapp.Activity
@@ -102,6 +103,13 @@ public class ShopListActivity extends BaseActivity {
         progressView.setIndicatorId(ProgressView.BallRotate);
         progressView.setIndicatorColor(getResources().getColor(R.color.colorAccent));
         ceShiLv.setFootLoadingView(progressView);
+        ceShiLv.setLoadMoreListener(new LoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                p = p + 1;
+                getNewsList();
+            }
+        });
     }
 
     @Override
@@ -292,9 +300,7 @@ public class ShopListActivity extends BaseActivity {
 
                     tvYouxiao.setText("筛选结果数：" + youxiao);
 
-                    ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
-                    p = p + 1;
-                    initData();
+                    //ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
                     poiBean = null;
                     result = null;
                 } catch (Exception e) {

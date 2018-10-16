@@ -1,8 +1,10 @@
 package com.poisearchphone.Adapter;
 
 import android.app.Activity;
+import android.content.ClipboardManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.ContactsContract.CommonDataKinds.Email;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.poisearchphone.Activity.ShopListActivity;
@@ -76,7 +79,7 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
                 } else {
                     holder.llGoods.measure(0, 0);
                     holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
-                    holder.tvNum.setText(String.valueOf(position));
+                    holder.tvNum.setText(String.valueOf(position + 1));
                     holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
                     holder.tvAddress.setText("地址：" + datas.get(position).getAddress());
                     if (Validator.isMobile(split[i])) {
@@ -101,6 +104,17 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
                             EasyToast.showShort(mContext, "添加成功");
                         }
                     });
+
+                    holder.llCopy.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View view) {
+                            ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            cm.setText(datas.get(position).getAddress());
+                            EasyToast.showShort(mContext, "店铺地址已复制到粘贴板");
+                            return false;
+                        }
+                    });
+
                 }
             }
         } else {
@@ -134,6 +148,18 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
                     EasyToast.showShort(mContext, "添加成功");
                 }
             });
+
+            holder.llCopy.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setText(datas.get(position).getAddress());
+                    EasyToast.showShort(mContext, "店铺地址已复制到粘贴板");
+                    return false;
+                }
+            });
+
         }
 
     }
@@ -160,6 +186,8 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
         TextView tvNum;
         @BindView(R.id.ll_goods)
         FrameLayout llGoods;
+        @BindView(R.id.ll_copy)
+        LinearLayout llCopy;
 
         public ViewHolder(View view) {
             super(view);
@@ -206,9 +234,8 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
 
 
     private void writeData() {
-        String filePath = "/sdcard/Test/";
-        String fileName = "log.txt";
-
+        String filePath = "/sdcard/POISearch/";
+        String fileName = "Search.txt";
         writeTxtToFile("txt content", filePath, fileName);
     }
 

@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 public class XieYiActivity extends BaseActivity {
     @BindView(R.id.btn_submit)
     Button btnSubmit;
+
     @Override
     protected void ready() {
         super.ready();
@@ -32,6 +33,7 @@ public class XieYiActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
+
     @Override
     protected int setthislayout() {
         return R.layout.xieyi_layout;
@@ -44,6 +46,9 @@ public class XieYiActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
+        if ("1".equals(getIntent().getStringExtra("type"))) {
+            btnSubmit.setVisibility(View.GONE);
+        }
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
