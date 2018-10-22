@@ -2,15 +2,12 @@ package com.poisearchphone.Activity;
 
 import android.app.Dialog;
 import android.content.ClipboardManager;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,8 +21,6 @@ import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.SpUtil;
 import com.poisearchphone.Utils.Utils;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +69,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         llMianze.setOnClickListener(this);
         llGengduo.setOnClickListener(this);
         llQingchu.setOnClickListener(this);
-
     }
 
     @Override
@@ -111,7 +105,17 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                     int rawContactsId = cursorUser.getInt(2);
                     Log.e("HomeActivity", name + "---" + id + "---" + rawContactsId);
                     if (name.startsWith("SAK")) {
-                        deleteCall(id);
+                        try {
+                            uri = Uri.parse("content://com.android.contacts/raw_contacts");
+                            resolver.delete(uri, "display_name=?", new String[]{name});
+                            uri = Uri.parse("content://com.android.contacts/data");
+                            resolver.delete(uri, "raw_contact_id=?", new String[]{rawContactsId + ""});
+                            resolver.delete(uri, "_id=?", new String[]{id + ""});
+                            Log.e("HomeActivity"+"d", name + "---" + id + "---" + rawContactsId);
+                            sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 runOnUiThread(new Runnable() {
@@ -122,22 +126,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 });
             }
         }.start();
-
-    }
-
-    private void deleteCall(int id) {
-        try {
-            // data表中对应的id值
-            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-            ops.add(ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI)
-                    .withSelection(ContactsContract.Data._ID + "=?", new String[]{String.valueOf(id)})
-                    .build());
-            context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
-        }
 
     }
 

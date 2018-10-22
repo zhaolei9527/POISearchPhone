@@ -116,7 +116,7 @@ public class ShopListAdapter extends RecyclerView.Adapter<ShopListAdapter.ViewHo
             }
         } else {
             holder.llGoods.measure(0, 0);
-            holder.tvNum.setText(String.valueOf(position));
+            holder.tvNum.setText(String.valueOf(position+1));
             holder.tvShoptitle.setText("店铺名：" + datas.get(position).getName());
             holder.tvCity.setText("城市：" + datas.get(position).getPname() + datas.get(position).getCityname() + datas.get(position).getAdname());
             holder.tvAddress.setText("地址：" + datas.get(position).getAddress());

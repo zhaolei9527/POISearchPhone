@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/y33"
                 android:layout_centerVertical="true"
-                android:hint="请输入关键词"
+                android:hint="多个关键字用“|”分割"
                 android:inputType="text"
                 android:singleLine="true"
                 android:textColor="@color/bgfff"

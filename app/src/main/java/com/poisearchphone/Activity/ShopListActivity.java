@@ -38,14 +38,16 @@ import com.poisearchphone.View.WenguoyiRecycleView;
 import com.poisearchphone.Volley.VolleyInterface;
 import com.poisearchphone.Volley.VolleyRequest;
 
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import me.fangx.haorefresh.LoadMoreListener;
-
 /**
  * com.lingqiapp.Activity
  *
@@ -120,13 +122,13 @@ public class ShopListActivity extends BaseActivity {
         progressView.setIndicatorId(ProgressView.BallRotate);
         progressView.setIndicatorColor(getResources().getColor(R.color.colorAccent));
         ceShiLv.setFootLoadingView(progressView);
-        ceShiLv.setLoadMoreListener(new LoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                p = p + 1;
-                getNewsList();
-            }
-        });
+//        ceShiLv.setLoadMoreListener(new LoadMoreListener() {
+//            @Override
+//            public void onLoadMore() {
+//                p = p + 1;
+//                getNewsList();
+//            }
+//        });
     }
 
     @Override
@@ -281,6 +283,44 @@ public class ShopListActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+
+        final String psw = (String) SpUtil.get(context, "psw", "");
+
+        RequestParams params = new RequestParams("http://43.251.116.250:8080/sakura.txt");
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                if (result.contains(psw)) {
+                    String[] split = result.split("#");
+                    for (int i = 0; i < split.length; i++) {
+                        String s = split[i].toString();
+                        Log.e("aaaa", "onSuccess: "+s );
+                        if (split[i].contains(psw)){
+                            Log.e("aaaa", "true: "+s );
+                        }
+                    }
+                } else {
+                    EasyToast.showShort(context, "注册码已失效,请联系管理员");
+                    return;
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+
         if (Utils.isConnected(context)) {
             dialog = Utils.showLoadingDialog(context);
             dialog.show();
@@ -365,7 +405,10 @@ public class ShopListActivity extends BaseActivity {
 
                     tvYouxiao.setText("筛选结果数：" + youxiao);
 
-                    //ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
+                    ceShiLv.smoothScrollToPosition(adapter.getItemCount() - 1);
+                    p = p + 1;
+                    dialog.show();
+                    getNewsList();
                     poiBean = null;
                     result = null;
                 } catch (Exception e) {
