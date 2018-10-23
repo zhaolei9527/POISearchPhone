@@ -14,7 +14,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.android.volley.VolleyError;
 import com.bigkoo.pickerview.OptionsPickerView;
@@ -32,9 +32,6 @@ import com.poisearchphone.Volley.VolleyInterface;
 import com.poisearchphone.Volley.VolleyRequest;
 
 import org.json.JSONArray;
-import org.xutils.common.Callback;
-import org.xutils.http.RequestParams;
-import org.xutils.x;
 
 import java.util.ArrayList;
 
@@ -47,15 +44,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     EditText etCity;
     @BindView(R.id.et_keyword)
     EditText etKeyword;
+    @BindView(R.id.et_hangye)
+    EditText etHangye;
     @BindView(R.id.btn_submit)
     Button btnSubmit;
     @BindView(R.id.cb_zuoji)
     CheckBox cbZuoji;
+    @BindView(R.id.ll_city)
+    LinearLayout ll_city;
+    @BindView(R.id.ll_hangye)
+    LinearLayout llHangye;
     private String keyword;
     private Dialog dialog;
     private ArrayList<JsonBean> options1Items = new ArrayList<>();
     private ArrayList<ArrayList<String>> options2Items = new ArrayList<>();
     private ArrayList<ArrayList<ArrayList<String>>> options3Items = new ArrayList<>();
+
+    private ArrayList<JsonBean> options11Items = new ArrayList<>();
+    private ArrayList<ArrayList<String>> options12Items = new ArrayList<>();
+    private ArrayList<ArrayList<ArrayList<String>>> options13Items = new ArrayList<>();
+
     private Thread thread;
     private static final int MSG_LOAD_DATA = 0x0001;
     private static final int MSG_LOAD_SUCCESS = 0x0002;
@@ -73,6 +81,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             public void run() {
                                 // 写子线程中的操作,解析省市区数据
                                 initJsonData();
+                                initJsonData2();
                             }
                         });
                         thread.start();
@@ -89,6 +98,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }
     };
+    private String hangye;
 
     public ArrayList<JsonBean> parseData(String result) {//Gson 解析
         ArrayList<JsonBean> detail = new ArrayList<>();
@@ -105,6 +115,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         return detail;
     }
+
 
     private void initJsonData() {//解析数据
 
@@ -164,6 +175,66 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+
+    private void initJsonData2() {//解析数据
+
+        /**
+         * 注意：assets 目录下的Json文件仅供参考，实际使用可自行替换文件
+         * 关键逻辑在于循环体
+         *
+         * */
+        String JsonData = new GetJsonDataUtil().getJson(this, "hangye.json");//获取assets目录下的json文件数据
+
+        ArrayList<JsonBean> jsonBean = parseData(JsonData);//用Gson 转成实体
+
+        /**
+         * 添加省份数据
+         *
+         * 注意：如果是添加的JavaBean实体，则实体类需要实现 IPickerViewData 接口，
+         * PickerView会通过getPickerViewText方法获取字符串显示出来。
+         */
+        options11Items = jsonBean;
+
+        for (int i = 0; i < jsonBean.size(); i++) {//遍历省份
+            ArrayList<String> CityList = new ArrayList<>();//该省的城市列表（第二级）
+            ArrayList<ArrayList<String>> Province_AreaList = new ArrayList<>();//该省的所有地区列表（第三极）
+
+            for (int c = 0; c < jsonBean.get(i).getCityList().size(); c++) {//遍历该省份的所有城市
+                String CityName = jsonBean.get(i).getCityList().get(c).getName();
+                CityList.add(CityName);//添加城市
+
+                ArrayList<String> City_AreaList = new ArrayList<>();//该城市的所有地区列表
+
+                //如果无地区数据，建议添加空字符串，防止数据为null 导致三个选项长度不匹配造成崩溃
+                if (jsonBean.get(i).getCityList().get(c).getArea() == null
+                        || jsonBean.get(i).getCityList().get(c).getArea().size() == 0) {
+                    City_AreaList.add("");
+                } else {
+
+                    for (int d = 0; d < jsonBean.get(i).getCityList().get(c).getArea().size(); d++) {//该城市对应地区所有数据
+                        String AreaName = jsonBean.get(i).getCityList().get(c).getArea().get(d);
+
+                        City_AreaList.add(AreaName);//添加该城市所有地区数据
+                    }
+                }
+                Province_AreaList.add(City_AreaList);//添加该省所有地区数据
+            }
+
+            /**
+             * 添加城市数据
+             */
+            options12Items.add(CityList);
+
+            /**
+             * 添加地区数据
+             */
+            // options13Items.add(Province_AreaList);
+        }
+        mHandler.sendEmptyMessage(MSG_LOAD_SUCCESS);
+
+    }
+
+
     private String province;
     private String city;
 
@@ -175,7 +246,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     //返回的分别是三个级别的选中位置
                     province = options1Items.get(options1).getPickerViewText();
                     city = options2Items.get(options1).get(options2);
-                    etCity.setText(city);
+
+                    if (etCity.getText().toString().trim().length() > 0) {
+                        etCity.setText(etCity.getText().toString().trim() + "#" + city);
+                    } else {
+                        etCity.setText(city);
+                    }
+
                 }
             })
                     .setTitleBgColor(getResources().getColor(R.color.pressedColor))
@@ -197,6 +274,40 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    private void ShowPickerView2() {// 弹出选择器
+        if (!options1Items.isEmpty()) {
+            OptionsPickerView pvOptions = new OptionsPickerView.Builder(this, new OptionsPickerView.OnOptionsSelectListener() {
+                @Override
+                public void onOptionsSelect(int options1, int options2, int options3, View v) {
+                    //返回的分别是三个级别的选中位置
+                    province = options11Items.get(options1).getPickerViewText();
+                    city = options12Items.get(options1).get(options2);
+                    if (etHangye.getText().toString().trim().length() > 0) {
+                        etHangye.setText(etHangye.getText().toString().trim() + "|" + city);
+                    } else {
+                        etHangye.setText(city);
+                    }
+
+                }
+            })
+                    .setTitleBgColor(getResources().getColor(R.color.pressedColor))
+                    .setCancelColor(getResources().getColor(R.color.text))
+                    .setSubmitColor(getResources().getColor(R.color.text))
+                    .setTitleText("选择城市")
+                    .setSelectOptions(0)//默认选中项
+                    .setTitleColor(getResources().getColor(R.color.text))
+                    .setDividerColor(Color.BLACK)
+                    .setTextColorCenter(Color.BLACK) //设置选中项文字颜色
+                    .setContentTextSize(20)
+                    .build();
+
+            //pvOptions.setPicker(options1Items);//一级选择器
+            pvOptions.setPicker(options11Items, options12Items);//二级选择器*/
+            //   pvOptions.setPicker(options1Items, options2Items, options3Items);//三级选择器
+            pvOptions.show();
+        }
+
+    }
 
     @Override
     protected void ready() {
@@ -220,11 +331,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initListener() {
+        ll_city.setOnClickListener(this);
+        llHangye.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
     }
 
     @Override
     protected void initData() {
+        String psw = String.valueOf(SpUtil.get(context, "psw", ""));
+        if (TextUtils.isEmpty(psw)) {
+            finish();
+            EasyToast.showShort(context, "帐号异常，请联系管理员");
+            startActivity(new Intent(context, LoginActivity.class));
+            return;
+        }
+        String str = String.valueOf(SpUtil.get(this, "androidId", ""));
+        str = str.substring(str.length() - 6, str.length()); // or str=str.Remove(str.Length-i,i);
+        str = Utils.md5(str);
+        str = Utils.md5(str);
+        str = str.substring(str.length() - 6, str.length()); // or str=str.Remove(str.Length-i,i);
+        if (str.equals(psw)) {
+        } else {
+            finish();
+            EasyToast.showShort(context, "帐号异常，请联系管理员");
+            return;
+        }
     }
 
     @Override
@@ -238,55 +369,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_submit:
-
-                ShowPickerView();
-
                 final String psw = (String) SpUtil.get(context, "psw", "");
-
-                RequestParams params = new RequestParams("http://43.251.116.250:8080/sakura.txt");
-                x.http().get(params, new Callback.CommonCallback<String>() {
-                    @Override
-                    public void onSuccess(String result) {
-                        if (result.contains(psw)) {
-                            String[] split = result.split("#");
-                            for (int i = 0; i < split.length; i++) {
-                                String s = split[i].toString();
-                                Log.e("aaaa", "onSuccess: " + s);
-                                if (split[i].contains(psw)) {
-                                    Log.e("aaaa", "true: " + s);
-                                }
-                            }
-                        } else {
-                            EasyToast.showShort(context, "注册码已失效,请联系管理员");
-                            return;
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable ex, boolean isOnCallback) {
-                        Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onCancelled(CancelledException cex) {
-                        Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFinished() {
-
-                    }
-                });
-
 
                 city = etCity.getText().toString().trim();
                 keyword = etKeyword.getText().toString().trim();
+                hangye = etHangye.getText().toString().trim();
+
                 if (TextUtils.isEmpty(city)) {
-                    EasyToast.showShort(context, etCity.getHint().toString());
+                    EasyToast.showShort(context, "请输入检索地区");
                     return;
                 }
-                if (TextUtils.isEmpty(keyword)) {
-                    EasyToast.showShort(context, etKeyword.getHint().toString());
+
+                if (TextUtils.isEmpty(keyword) && TextUtils.isEmpty(hangye)) {
+                    EasyToast.showShort(context, "请选择检索条件或输入关键词");
                     return;
                 }
 
@@ -298,6 +393,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     EasyToast.showShort(context, R.string.Networkexception);
                 }
                 break;
+            case R.id.ll_hangye:
+                ShowPickerView2();
+                break;
+            case R.id.ll_city:
+                ShowPickerView();
+                break;
             default:
                 break;
         }
@@ -308,6 +409,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 登录获取
      */
     private void getSearch() {
+
+        Log.e("MainActivity", keyword);
+        Log.e("MainActivity", city);
+
+        if (city.contains("#")) {
+            String[] split = city.split("#");
+            city = split[0];
+        }
+
         VolleyRequest.RequestGet(context, "https://restapi.amap.com/v3/place/text?keywords=" + keyword + "&city=" + city + "&output=json&offset=1&page=1&key=b40c90fb307c2002ea03d28da8b487e5&extensions=all", city, new VolleyInterface(context) {
             @Override
             public void onMySuccess(String result) {
@@ -339,16 +449,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         String count = poiBean.getCount();
                         Integer integer = Integer.parseInt(count);
                         if (integer > 0) {
-                            new CommomDialog(context, R.style.dialog, "查询结果数：" + count + "户\n点击确认查看~", new CommomDialog.OnCloseListener() {
+                            new CommomDialog(context, R.style.dialog, "查询结果数：" + count + "+户\n点击确认查看~", new CommomDialog.OnCloseListener() {
                                 @Override
                                 public void onClick(Dialog dialog, final boolean confirm) {
                                     if (confirm) {
                                         dialog.dismiss();
-                                        startActivity(new Intent(context, ShopListActivity.class)
-                                                .putExtra("keyword", keyword)
-                                                .putExtra("city", city)
-                                                .putExtra("zuoji", cbZuoji.isChecked())
-                                        );
+
+                                        if (hangye.length() == 0) {
+                                            startActivity(new Intent(context, ShopListActivity.class)
+                                                    .putExtra("keyword", keyword)
+                                                    .putExtra("city", etCity.getText().toString().trim())
+                                                    .putExtra("zuoji", cbZuoji.isChecked())
+                                            );
+                                        } else if (keyword.length() == 0) {
+                                            startActivity(new Intent(context, ShopListActivity.class)
+                                                    .putExtra("keyword", hangye)
+                                                    .putExtra("city", etCity.getText().toString().trim())
+                                                    .putExtra("zuoji", cbZuoji.isChecked())
+                                            );
+                                        } else if (keyword.length() > 0 && hangye.length() > 0) {
+                                            startActivity(new Intent(context, ShopListActivity.class)
+                                                    .putExtra("keyword", hangye + "|" + keyword)
+                                                    .putExtra("city", etCity.getText().toString().trim())
+                                                    .putExtra("zuoji", cbZuoji.isChecked())
+                                            );
+                                        }
                                     } else {
                                         dialog.dismiss();
                                     }

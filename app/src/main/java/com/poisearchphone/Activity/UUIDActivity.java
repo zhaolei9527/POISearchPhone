@@ -1,7 +1,6 @@
 package com.poisearchphone.Activity;
 
 import android.os.Bundle;
-import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.poisearchphone.R;
+import com.poisearchphone.Utils.SpUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +26,13 @@ public class UUIDActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uuid);
         ButterKnife.bind(this);
-        androidId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+
+        if (TextUtils.isEmpty(String.valueOf(SpUtil.get(this, "androidId", "")))) {
+            androidId = createRandom(false, 18);
+            SpUtil.putAndApply(this, "androidId", androidId);
+        } else {
+            androidId = String.valueOf(SpUtil.get(this, "androidId", ""));
+        }
 
         if (!TextUtils.isEmpty(androidId)) {
             tvUuid.setText(androidId);
@@ -42,4 +48,38 @@ public class UUIDActivity extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * 创建指定数量的随机字符串
+     *
+     * @param numberFlag 是否是数字
+     * @param length
+     * @return
+     */
+    public static String createRandom(boolean numberFlag, int length) {
+        String retStr = "";
+        String strTable = numberFlag ? "1234567890" : "1234567890abcdefghijkmnpqrstuvwxyz";
+        int len = strTable.length();
+        boolean bDone = true;
+        do {
+            retStr = "";
+            int count = 0;
+            for (int i = 0; i < length; i++) {
+                double dblR = Math.random() * len;
+                int intR = (int) Math.floor(dblR);
+                char c = strTable.charAt(intR);
+                if (('0' <= c) && (c <= '9')) {
+                    count++;
+                }
+                retStr += strTable.charAt(intR);
+            }
+            if (count >= 2) {
+                bDone = false;
+            }
+        } while (bDone);
+
+        return retStr;
+    }
+
+
 }

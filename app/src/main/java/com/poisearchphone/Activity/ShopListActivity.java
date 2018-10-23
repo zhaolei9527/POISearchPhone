@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import com.google.gson.Gson;
 import com.poisearchphone.Adapter.ShopListAdapter;
 import com.poisearchphone.Base.BaseActivity;
 import com.poisearchphone.Bean.POIBean;
+import com.poisearchphone.InPutDialog;
 import com.poisearchphone.R;
 import com.poisearchphone.Utils.EasyToast;
 import com.poisearchphone.Utils.SpUtil;
@@ -38,16 +40,13 @@ import com.poisearchphone.View.WenguoyiRecycleView;
 import com.poisearchphone.Volley.VolleyInterface;
 import com.poisearchphone.Volley.VolleyRequest;
 
-import org.xutils.common.Callback;
-import org.xutils.http.RequestParams;
-import org.xutils.x;
-
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 /**
  * com.lingqiapp.Activity
  *
@@ -81,9 +80,11 @@ public class ShopListActivity extends BaseActivity {
     private SakuraLinearLayoutManager line;
     private String city;
     private String keyword;
-    private Dialog dialog;
+    public Dialog dialog;
     public static boolean zuoji;
     private int youxiao = 0;
+    private int citys_youxiao = 0;
+    private String[] citys;
 
     @Override
     protected int setthislayout() {
@@ -93,18 +94,27 @@ public class ShopListActivity extends BaseActivity {
     @Override
     protected void initview() {
 
-        String psw = (String) SpUtil.get(context, "psw", "");
-        //String account = (String) SpUtil.get(context, "account", "");
-
+        String psw = String.valueOf(SpUtil.get(context, "psw", ""));
         if (TextUtils.isEmpty(psw)) {
+            finish();
+            EasyToast.showShort(context, "帐号异常，请联系管理员");
             startActivity(new Intent(context, LoginActivity.class));
+            return;
+        }
+        String str = String.valueOf(SpUtil.get(this, "androidId", ""));
+        str = str.substring(str.length() - 6, str.length()); // or str=str.Remove(str.Length-i,i);
+        str = Utils.md5(str);
+        str = Utils.md5(str);
+        str = str.substring(str.length() - 6, str.length()); // or str=str.Remove(str.Length-i,i);
+        if (str.equals(psw)) {
+        } else {
+            finish();
+            EasyToast.showShort(context, "帐号异常，请联系管理员");
+            return;
         }
 
-//        if (TextUtils.isEmpty(account)) {
-//            startActivity(new Intent(context, LoginActivity.class));
-//        }
-
         city = getIntent().getStringExtra("city");
+        citys = city.split("#");
         keyword = getIntent().getStringExtra("keyword");
         zuoji = getIntent().getBooleanExtra("zuoji", false);
 
@@ -158,52 +168,97 @@ public class ShopListActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 flSave.setVisibility(View.GONE);
-                new Thread(new Runnable() {
+
+                new InPutDialog(context, R.style.dialog, "请输入导入数量~", new InPutDialog.OnCloseListener() {
                     @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                flSave.setVisibility(View.GONE);
-                                dialog.show();
+                    public void onClick(final Dialog dialog, final boolean confirm) {
+                        if (confirm) {
+                            dialog.dismiss();
+                            final EditText contentTxt = (EditText) dialog.findViewById(R.id.content);
+                            if (TextUtils.isEmpty(contentTxt.getText().toString().trim())) {
+                                EasyToast.showShort(context, contentTxt.getHint().toString().trim());
+                                return;
                             }
-                        });
-                        for (int i = 0; i < adapter.getDatas().size(); i++) {
-                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
-                                if (adapter.getDatas().get(i).getTel().contains(";")) {
-                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
-                                    for (int i1 = 0; i1 < split.length; i1++) {
-                                        if (zuoji) {
-                                            if (Validator.isMobile(split[i1])) {
-                                                writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
-                                            }
-                                        } else {
-                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
-                                        }
-                                        continue;
-                                    }
-                                } else {
-                                    if (zuoji) {
-                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
-                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
-                                        }
-                                    } else {
-                                        writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
-                                    }
+
+                            int i = Integer.parseInt(contentTxt.getText().toString().trim());
+
+                            if (i == 0) {
+                                EasyToast.showShort(context, "请输入有效数量");
+                                return;
+                            }
+
+                            if (!zuoji) {
+                                if (i > adapter.getItemCount()) {
+                                    EasyToast.showShort(context, "导入数量超出检索结果");
+                                    return;
+                                }
+                            } else {
+                                if (i > youxiao) {
+                                    EasyToast.showShort(context, "导入数量超出筛选有效数");
+                                    return;
                                 }
                             }
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                flSave.setVisibility(View.GONE);
+                                                ShopListActivity.this.dialog.show();
+                                            }
+                                        });
+                                        for (int i = 0; i < Integer.parseInt(contentTxt.getText().toString().trim()); i++) {
+                                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
+                                                if (adapter.getDatas().get(i).getTel().contains(";")) {
+                                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
+                                                    for (int i1 = 0; i1 < split.length; i1++) {
+                                                        if (zuoji) {
+                                                            if (Validator.isMobile(split[i1])) {
+                                                                writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                                            }
+                                                        } else {
+                                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + split[i1] + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                                        }
+                                                        continue;
+                                                    }
+                                                } else {
+                                                    if (zuoji) {
+                                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
+                                                            writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                                        }
+                                                    } else {
+                                                        writeData("商户：" + adapter.getDatas().get(i).getName() + "--电话：" + adapter.getDatas().get(i).getTel() + "--城市：" + adapter.getDatas().get(i).getPname() + adapter.getDatas().get(i).getCityname() + adapter.getDatas().get(i).getAdname() + "--地址：" + adapter.getDatas().get(i).getAddress());
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ShopListActivity.this.dialog.dismiss();
+                                                EasyToast.showShort(context, "导出完成：目录 /sdcard/POISearch/Search.txt");
+                                            }
+                                        });
+
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+                            }).start();
+
+
+                        } else {
+                            dialog.dismiss();
                         }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.dismiss();
-                                EasyToast.showShort(context, "导出完成：目录 /sdcard/POISearch/Search.txt");
-                            }
-                        });
-
                     }
-                }).start();
+                }).setTitle("提示").show();
 
 
             }
@@ -212,54 +267,93 @@ public class ShopListActivity extends BaseActivity {
         tvDaorucall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                flSave.setVisibility(View.GONE);
 
-                new Thread(new Runnable() {
+                new InPutDialog(context, R.style.dialog, "请输入导入数量~", new InPutDialog.OnCloseListener() {
                     @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                flSave.setVisibility(View.GONE);
-                                dialog.show();
+                    public void onClick(final Dialog dialog, final boolean confirm) {
+                        if (confirm) {
+                            dialog.dismiss();
+                            final EditText contentTxt = (EditText) dialog.findViewById(R.id.content);
+                            if (TextUtils.isEmpty(contentTxt.getText().toString().trim())) {
+                                EasyToast.showShort(context, contentTxt.getHint().toString().trim());
+                                return;
                             }
-                        });
-                        for (int i = 0; i < adapter.getDatas().size(); i++) {
-                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
-                                if (adapter.getDatas().get(i).getTel().contains(";")) {
-                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
-                                    for (int i1 = 0; i1 < split.length; i1++) {
-                                        if (zuoji) {
-                                            if (Validator.isMobile(split[i1])) {
-                                                addContact(adapter.getDatas().get(i).getName(), split[i1]);
-                                            }
-                                        } else {
-                                            addContact(adapter.getDatas().get(i).getName(), split[i1]);
-                                        }
-                                        continue;
-                                    }
-                                } else {
-                                    if (zuoji) {
-                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
-                                            addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
-                                        }
-                                    } else {
-                                        addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
-                                    }
 
+                            int i = Integer.parseInt(contentTxt.getText().toString().trim());
+
+                            if (!zuoji) {
+                                if (i > adapter.getItemCount()) {
+                                    EasyToast.showShort(context, "导入数量超出检索结果");
+                                    return;
+                                }
+                            } else {
+                                if (i > youxiao) {
+                                    EasyToast.showShort(context, "导入数量超出筛选有效数");
+                                    return;
                                 }
                             }
+
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                flSave.setVisibility(View.GONE);
+                                                ShopListActivity.this.dialog.show();
+                                            }
+                                        });
+                                        for (int i = 0; i < Integer.parseInt(contentTxt.getText().toString().trim()); i++) {
+                                            if (!"暂无".equals(adapter.getDatas().get(i).getTel())) {
+                                                if (adapter.getDatas().get(i).getTel().contains(";")) {
+                                                    String[] split = adapter.getDatas().get(i).getTel().split(";");
+                                                    for (int i1 = 0; i1 < split.length; i1++) {
+                                                        if (zuoji) {
+                                                            if (Validator.isMobile(split[i1])) {
+                                                                addContact(adapter.getDatas().get(i).getName(), split[i1]);
+                                                            }
+                                                        } else {
+                                                            addContact(adapter.getDatas().get(i).getName(), split[i1]);
+                                                        }
+                                                        continue;
+                                                    }
+                                                } else {
+                                                    if (zuoji) {
+                                                        if (Validator.isMobile(adapter.getDatas().get(i).getTel())) {
+                                                            addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
+                                                        }
+                                                    } else {
+                                                        addContact(adapter.getDatas().get(i).getName(), adapter.getDatas().get(i).getTel());
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ShopListActivity.this.dialog.dismiss();
+                                                EasyToast.showShort(context, "导入完成");
+                                            }
+                                        });
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+
+
+                        } else {
+                            dialog.dismiss();
                         }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.dismiss();
-                                EasyToast.showShort(context, "导入完成");
-                            }
-                        });
-
                     }
-                }).start();
+                }).setTitle("提示").show();
+
+
             }
         });
 
@@ -283,43 +377,7 @@ public class ShopListActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-
         final String psw = (String) SpUtil.get(context, "psw", "");
-
-        RequestParams params = new RequestParams("http://43.251.116.250:8080/sakura.txt");
-        x.http().get(params, new Callback.CommonCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                if (result.contains(psw)) {
-                    String[] split = result.split("#");
-                    for (int i = 0; i < split.length; i++) {
-                        String s = split[i].toString();
-                        Log.e("aaaa", "onSuccess: "+s );
-                        if (split[i].contains(psw)){
-                            Log.e("aaaa", "true: "+s );
-                        }
-                    }
-                } else {
-                    EasyToast.showShort(context, "注册码已失效,请联系管理员");
-                    return;
-                }
-            }
-
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFinished() {
-
-            }
-        });
 
         if (Utils.isConnected(context)) {
             dialog = Utils.showLoadingDialog(context);
@@ -337,26 +395,36 @@ public class ShopListActivity extends BaseActivity {
         ButterKnife.bind(this);
     }
 
+
     /**
      * 新闻列表获取
      */
     private void getNewsList() {
-        VolleyRequest.RequestGet(context, "https://restapi.amap.com/v3/place/text?keywords=" + keyword + "&city=" + city + "&output=json&offset=50&page=" + p + "&key=b40c90fb307c2002ea03d28da8b487e5&extensions=all", city, new VolleyInterface(context) {
+
+        VolleyRequest.RequestGet(context, "https://restapi.amap.com/v3/place/text?keywords=" + keyword + "&city=" + citys[citys_youxiao] + "&output=json&offset=100&page=" + p + "&key=b40c90fb307c2002ea03d28da8b487e5&extensions=all", city, new VolleyInterface(context) {
             @Override
             public void onMySuccess(String result) {
                 try {
+                    Log.e("ShopListActivity", keyword);
+                    Log.e("ShopListActivity", citys[citys_youxiao]);
                     dialog.dismiss();
-                    Log.e("NewsListFragment", result.toString());
                     if (result.contains("[]")) {
                         Log.e("NewsListFragment", "has[]");
                         result = result.replace("[]", "暂无");
                     }
-                    Log.e("NewsListFragment", result.toString());
-
-                    if (result.contains("\"count\":\"0\"")) {
+                    //Log.e("NewsListFragment", result.toString());
+                    if (result.contains("\"count\":\"0\"") || result.contains("\"pois\":暂无")) {
                         if (p != 1) {
                             p = p - 1;
-                            Toast.makeText(context, "没有更多了", Toast.LENGTH_SHORT).show();
+                            if (citys.length - 1 > citys_youxiao) {
+                                citys_youxiao = citys_youxiao + 1;
+                                p = 1;
+                                dialog.show();
+                                getNewsList();
+                            } else {
+                                Toast.makeText(context, "没有更多了", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
                         } else {
 
                         }
@@ -366,6 +434,7 @@ public class ShopListActivity extends BaseActivity {
                     }
 
                     POIBean poiBean = new Gson().fromJson(result, POIBean.class);
+
                     if (ceShiLv != null) {
                         ceShiLv.setEnabled(true);
                         ceShiLv.loadMoreComplete();
@@ -392,7 +461,7 @@ public class ShopListActivity extends BaseActivity {
                         }
                     }
 
-                    if (p == 1) {
+                    if (p == 1 && citys_youxiao == 0) {
                         adapter = new ShopListAdapter(ShopListActivity.this, finalPoiBean);
                         ceShiLv.setAdapter(adapter);
                         ceShiLv.setCanloadMore(true);
@@ -413,6 +482,10 @@ public class ShopListActivity extends BaseActivity {
                     result = null;
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("ShopListActivity", "p:" + p);
+                    Log.e("ShopListActivity", keyword);
+                    Log.e("ShopListActivity", citys[citys_youxiao]);
+                    Log.e("ShopListActivity", result);
                 }
             }
 
