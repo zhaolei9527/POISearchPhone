@@ -1,4 +1,13 @@
 <resources>
+    <string name="app_name">智能商户助手</string>
+    <string name="loading">加载中......</string>
+    <string name="requstPerminssions">权限申请</string>
+    <string name="notmore">没有更多了</string>
+    <string name="Thepermissionapplicationisrejected">应用需要这些权限保证功能</string>
+    <string name="Networkexception">网络异常</string>
+    <string name="Clicktheexitprogramagain">再按一次退出</string>
+    <string name="Abnormalserver">服务器异常</string>
+    <string name="hasError">出错啦</string>
     <string name="pickerview_cancel">取消</string>
     <string name="pickerview_submit">确定</string>
     <string name="pickerview_year">年</string>
