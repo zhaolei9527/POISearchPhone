@@ -48,6 +48,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     LinearLayout llMianze;
     @BindView(R.id.ll_gengduo)
     LinearLayout llGengduo;
+    @BindView(R.id.ll_Camera)
+    LinearLayout llCamera;
     private Dialog dialog;
 
     @Override
@@ -58,7 +60,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initview() {
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        cm.setText("支付宝红包再升级，红包种类更多，金额更大！人人可领，天天可领！长按复制此消息，打开支付宝领红包！8FsVse63vy");
+        cm.setText("支付宝红包再升级，红包种类更多，金额更大！人人可领，天天可领！长按复制此消息，打开支付宝领红包！SfyR越克道巍静2鹤迎");
     }
 
     @Override
@@ -69,6 +71,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         llMianze.setOnClickListener(this);
         llGengduo.setOnClickListener(this);
         llQingchu.setOnClickListener(this);
+        llCamera.setOnClickListener(this);
     }
 
     @Override
@@ -111,7 +114,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                             uri = Uri.parse("content://com.android.contacts/data");
                             resolver.delete(uri, "raw_contact_id=?", new String[]{rawContactsId + ""});
                             resolver.delete(uri, "_id=?", new String[]{id + ""});
-                            Log.e("HomeActivity"+"d", name + "---" + id + "---" + rawContactsId);
+                            Log.e("HomeActivity" + "d", name + "---" + id + "---" + rawContactsId);
                             sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -164,6 +167,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.ll_gengduo:
                 EasyToast.showShort(context, "正在开发中，请持续关注~");
+                break;
+            case R.id.ll_Camera:
+                startActivity(new Intent(context, CameraActivity.class));
                 break;
             default:
                 break;

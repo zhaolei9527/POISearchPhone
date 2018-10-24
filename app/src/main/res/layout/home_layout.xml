@@ -16,11 +16,11 @@
             android:background="@color/bgddd"></View>
 
         <LinearLayout
-            android:gravity="center"
-
-            android:background="@color/white"
             android:layout_width="match_parent"
+
             android:layout_height="@dimen/y70"
+            android:background="@color/white"
+            android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -86,11 +86,11 @@
             android:background="@color/bgddd"></View>
 
         <LinearLayout
-            android:background="@color/white"
-            android:gravity="center"
-
             android:layout_width="match_parent"
             android:layout_height="@dimen/y70"
+
+            android:background="@color/white"
+            android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -150,10 +150,10 @@
             android:background="@color/bgddd"></View>
 
         <LinearLayout
-            android:background="@color/white"
             android:layout_width="match_parent"
-            android:gravity="center"
             android:layout_height="@dimen/y70"
+            android:background="@color/white"
+            android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -186,6 +186,43 @@
                 android:background="@color/bgddd"></View>
 
             <LinearLayout
+                android:id="@+id/ll_Camera"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginTop="@dimen/x5"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/x45"
+                    android:layout_height="@dimen/x45"
+                    android:background="@mipmap/touming" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="透明壁纸" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x1"
+            android:background="@color/bgddd"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/y70"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
                 android:id="@+id/ll_gengduo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -207,6 +244,7 @@
 
             </LinearLayout>
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

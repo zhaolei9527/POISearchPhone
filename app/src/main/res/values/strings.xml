@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">智能商户助手</string>
+    <string name="app_label">A透明壁纸</string>
     <string name="loading">加载中......</string>
     <string name="requstPerminssions">权限申请</string>
     <string name="notmore">没有更多了</string>
@@ -16,4 +17,6 @@
     <string name="pickerview_hours">时</string>
     <string name="pickerview_minutes">分</string>
     <string name="pickerview_seconds">秒</string>
+    <string name="_lease_open_permissions">权限申请,请开通权限</string>
+    <string name="choose_wallpaper">请选择A透明壁纸</string>
 </resources>
